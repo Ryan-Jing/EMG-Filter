@@ -1,8 +1,12 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
-dataset = pd.read_csv('EMG_Datasets/EMG_Datasets.csv')
+# print(os.listdir())
+path = 'EMG-Filter/EMG_Datasets/EMG_Datasets.csv'
+
+dataset = pd.read_csv(path)
 relaxedFilePath = 'relaxedRMS.csv'
 contractFilePath = 'contractRMS.csv'
 
