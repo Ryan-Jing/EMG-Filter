@@ -7,8 +7,8 @@ import os
 path = 'EMG-Filter/EMG_Datasets/EMG_Datasets.csv'
 
 dataset = pd.read_csv(path)
-relaxedFilePath = 'relaxedRMS.csv'
-contractFilePath = 'contractRMS.csv'
+relaxedFilePath = 'EMG-Filter/Output_Files/relaxedRMS.csv'
+contractFilePath = 'EMG-Filter/Output_Files/contractRMS.csv'
 
 x = []
 yRelaxed = []
@@ -19,11 +19,26 @@ def RMS(emgData):
     return np.mean((np.sqrt((emgData ** 2))))
 
 for _, row in dataset.iterrows():
+    time = (row['Time (s)'])
     relaxedEMG = row['EMG_Relaxed (mV)']
     contractEMG = row['EMG_Contracted (mV)']
-    x.append(row['Time (s)'])
-    yContract.append(RMS(relaxedEMG))
-    yRelaxed.append(RMS(contractEMG))
+    relaxedRMS = RMS(relaxedEMG)
+    contractedRMS = RMS(contractEMG)
+
+    x.append(time)
+    yContract.append(contractedRMS)
+    yRelaxed.append(relaxedRMS)
+
+with open(contractFilePath, "w") as file:
+    file.write("Time (s),Filtered EMG Contracted\n")
+    for time, contractedRMS in zip(x, yContract):
+        file.write(f"{time},{contractedRMS}\n")
+
+with open(relaxedFilePath, "w") as file:
+    file.write("Time (s),Filtered EMG Relaxed\n")
+    for time, relaxedRMS in zip(x, yRelaxed):
+        file.write(f"{time},{relaxedRMS}\n")
+
 
 print(len(x))
 print(len(yRelaxed))
