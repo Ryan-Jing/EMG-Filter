@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import threading
 
 from scipy import signal
 from scipy.fft import fft, fftfreq
@@ -69,6 +68,13 @@ def check_termination():
     user_input = input("Type 'exit' to terminate the program: ")
     return user_input.lower() == termination_word.lower()
 
+print(len(xf))
+print(len(yf))
+print(len(databpf_f))
+print(len(databpf_fOne))
+
+plt.figure(figsize=(14, 6))
+
 plt.subplot(1,3,1)
 plt.plot(xf,yf,'--',label='signal')
 plt.xlim([98,102])
@@ -85,6 +91,7 @@ plt.xlim([98,102])
 plt.legend()
 
 plt.tight_layout()  # prevent overlapping of subplots
+
 
 plt.pause(0.1) # so that the program doesnt hold/freeze with plt.show(), can continue check_termination
 
