@@ -30,12 +30,12 @@ for _, row in dataset.iterrows():
     yRelaxed.append(relaxedRMS)
 
 with open(contractFilePath, "w") as file:
-    file.write("Time (s),Filtered EMG Contracted\n")
+    file.write("Time (s),RMS EMG Contracted\n")
     for time, contractedRMS in zip(x, yContract):
         file.write(f"{time},{contractedRMS}\n")
 
 with open(relaxedFilePath, "w") as file:
-    file.write("Time (s),Filtered EMG Relaxed\n")
+    file.write("Time (s),RMS EMG Relaxed\n")
     for time, relaxedRMS in zip(x, yRelaxed):
         file.write(f"{time},{relaxedRMS}\n")
 
