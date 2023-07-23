@@ -8,7 +8,7 @@ from scipy.io import wavfile
 import wave
 
 # TEST BASE PARAMETERS
-CHUNK_LENGTH = 10
+CHUNK_LENGTH = 160
 OVERLAP = 0
 CENTRE_FREQUENCY = 50
 TYPE = "butterworth"
@@ -96,7 +96,7 @@ def main():
             filtered_chunk = filter_chunk(filter=filter, chunk=chunk)
             rms = get_rms(filtered_chunk=filtered_chunk)
             # idk if im correctly understanding this equation
-            synth_chunk = synthesize(rms=rms, chunk_length=len(chunk), centre_freq_band=200*i) 
+            synth_chunk = synthesize(rms=rms, chunk_length=len(chunk), centre_freq_band=INTERVAL*i) 
             chunks_for_filter.append(synth_chunk)
         synth_chunks.append(chunks_for_filter)
         
@@ -114,7 +114,7 @@ def main():
         output_file.setparams((num_channels, bytes_per_sample, sample_rate, num_frames, "NONE", "Uncompressed"))
         output_file.writeframes(summed_chunks.astype(np.int16).tobytes())
     
-    amplified_chunks = summed_chunks*10e10
+    amplified_chunks = summed_chunks*10e11
         
     with wave.open("output_amplified.wav", "w") as outputfile:
         outputfile.setparams((num_channels, bytes_per_sample, sample_rate, num_frames, "NONE", "Uncompressed"))
