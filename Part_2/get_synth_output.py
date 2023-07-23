@@ -5,20 +5,21 @@ from scipy.io import wavfile
 import wave
 
 # TEST BASE PARAMETERS
-CHUNK_LENGTH = 160 # 10ms because sample rate is 16kHz
+CHUNK_LENGTH = 50 # 10ms because sample rate is 16kHz
 OVERLAP = 0
-CENTRE_FREQUENCY = 10e2
+CENTRE_FREQUENCY = 1000
+SAMPLING_RATE = 16e3
 TYPE = "butterworth"
-BAND_WIDTH = 10e2-1
-ORDER = 30
-NUMBER_OF_FILTERS = 1
-INTERVAL = 1000
+BAND_WIDTH = 990
+ORDER = 40
+NUMBER_OF_FILTERS = 35
+INTERVAL = 100
 OUTPUT_FILE = "./output_test.wav"
 
 rms_values = []
 sin_values = []
 
-def create_bandpass_filters(centre_frequency, band_width, filter_type, number_of_filters, order, interval, sample_rate = 16000):
+def create_bandpass_filters(centre_frequency, band_width, filter_type, number_of_filters, order, interval, sample_rate=SAMPLING_RATE):
     filters = [create_bandpass_filter(
             filter_type=filter_type, 
             order=order, 
@@ -59,9 +60,9 @@ def get_rms(filtered_chunk):
     rms_values.append(rms)
     return rms
 
-def synthesize(rms, chunk_length, centre_freq_band):
+def synthesize(rms, chunk_length, centre_freq_band, sampling_rate=SAMPLING_RATE):
     time = np.arange(chunk_length)
-    sin_wave = np.sin(2 * np.pi * centre_freq_band * time)
+    sin_wave = np.sin(2 * np.pi * centre_freq_band * time/sampling_rate)
     varying_amplitude = rms * sin_wave
     for val in varying_amplitude.tolist():
         sin_values.append(val)
@@ -127,8 +128,6 @@ def main():
     bytes_per_sample = 2 # 16 bit audio
     num_frames = len(summed_chunks)
     
-
-
     with wave.open(OUTPUT_FILE, 'w') as output_file:
         output_file.setparams((num_channels, bytes_per_sample, sample_rate, num_frames, "NONE", "Uncompressed"))
         output_file.writeframes(summed_chunks.astype(np.int16).tobytes())
