@@ -5,15 +5,15 @@ from scipy.io import wavfile
 import wave
 
 # TEST BASE PARAMETERS
-CHUNK_LENGTH = 50 # 10ms because sample rate is 16kHz
+CHUNK_LENGTH = 160 # 160 is 10ms because sample rate is 16kHz
 OVERLAP = 0
 CENTRE_FREQUENCY = 1000
 SAMPLING_RATE = 16e3
-TYPE = "butterworth"
-BAND_WIDTH = 990
+TYPE = "chebyshev"
+BAND_WIDTH = CENTRE_FREQUENCY-10
 ORDER = 40
-NUMBER_OF_FILTERS = 35
-INTERVAL = 100
+NUMBER_OF_FILTERS = 3
+INTERVAL = 40
 OUTPUT_FILE = "./output_test.wav"
 
 rms_values = []
@@ -51,7 +51,6 @@ def create_bandpass_filter(filter_type: str, order: int, centre_freq: int, band_
         else:
             raise ValueError("Filter type must be either 'butterworth' or 'chebyshev'")
 
-
 def filter_chunk(filter, chunk):
     return signal.sosfilt(filter, chunk)
 
@@ -67,8 +66,6 @@ def synthesize(rms, chunk_length, centre_freq_band, sampling_rate=SAMPLING_RATE)
     for val in varying_amplitude.tolist():
         sin_values.append(val)
     return varying_amplitude
-
-
 
 def concat_chunks(chunks):
     return np.concatenate(chunks)
@@ -110,16 +107,12 @@ def main():
             chunks_for_filter.append(synth_chunk)
             # chunks_for_filter.append(filtered_chunk)
         synth_chunks.append(chunks_for_filter)
-    
-    
 
     concatenated_chunks = []
     for chunk_channel in synth_chunks:
         concatenated_chunks.append(concat_chunks(chunk_channel))
     
-    
     concatenated_chunks = np.array(concatenated_chunks)
-            
 
     summed_chunks = np.sum(concatenated_chunks, axis=0)    
     
