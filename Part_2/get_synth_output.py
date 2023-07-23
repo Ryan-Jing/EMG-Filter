@@ -8,13 +8,13 @@ from scipy.io import wavfile
 import wave
 
 # TEST BASE PARAMETERS
-CHUNK_LENGTH = 200
+CHUNK_LENGTH = 10
 OVERLAP = 0
 CENTRE_FREQUENCY = 50
 TYPE = "butterworth"
 BAND_WIDTH = 45
 ORDER = 5
-NUMBER_OF_FILTERS = 20
+NUMBER_OF_FILTERS = 10
 OVERLAP = 0
 INTERVAL = 50
 OUTPUT_FILE = "./output_test.wav"
@@ -54,6 +54,10 @@ def get_rms(filtered_chunk):
 
 def synthesize(rms, chunk_length, centre_freq_band):
     time = np.arange(chunk_length)
+    sin_val = np.sin(2 * np.pi * centre_freq_band * time)
+    print("max sin: ", max(sin_val))
+    print("min sin: ", min(sin_val))
+    print("average sin: ", np.mean(sin_val))
     varying_amplitude = rms * np.sin(2 * np.pi * centre_freq_band * time)
     return varying_amplitude
 
@@ -88,10 +92,11 @@ def main():
     synth_chunks = []
     for filter in filters:
         chunks_for_filter = []
-        for chunk in test_chunks:
+        for i, chunk in enumerate(test_chunks):
             filtered_chunk = filter_chunk(filter=filter, chunk=chunk)
             rms = get_rms(filtered_chunk=filtered_chunk)
-            synth_chunk = synthesize(rms=rms, chunk_length=len(chunk), centre_freq_band=200)
+            # idk if im correctly understanding this equation
+            synth_chunk = synthesize(rms=rms, chunk_length=len(chunk), centre_freq_band=200*i) 
             chunks_for_filter.append(synth_chunk)
         synth_chunks.append(chunks_for_filter)
         
@@ -109,7 +114,7 @@ def main():
         output_file.setparams((num_channels, bytes_per_sample, sample_rate, num_frames, "NONE", "Uncompressed"))
         output_file.writeframes(summed_chunks.astype(np.int16).tobytes())
     
-    amplified_chunks = summed_chunks*10e17
+    amplified_chunks = summed_chunks*10e10
         
     with wave.open("output_amplified.wav", "w") as outputfile:
         outputfile.setparams((num_channels, bytes_per_sample, sample_rate, num_frames, "NONE", "Uncompressed"))
