@@ -1,4 +1,5 @@
 # workaround for sounddevice and soundfile: https://github.com/ohmtech-rdi/eurorack-blocks/issues/444
+# # for matthew: cp /opt/homebrew/Cellar/libsndfile/1.2.0_1/lib/libsndfile.1.0.35.dylib  /opt/homebrew/Cellar/libsndfile/1.2.0_1/bin/
 import sys
 import sounddevice as sd
 import soundfile as sf
