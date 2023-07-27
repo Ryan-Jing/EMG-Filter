@@ -16,22 +16,23 @@ contractData = dataset['EMG_Contracted (mV)'].to_numpy()
 x = np.linspace(0,10,len(contractData)) # fs is 10000/10 = 1000
 
 order = 8
-f1 = 0.1
-f2 = 160
-f3 = 57
-f4 = 63 
+fs = 1000
+frequencies_bandpass = [40, 100]
+frequencies_stop = [57, 63]
 
-sos = signal.butter(order,[f1,f2], btype='bandpass', fs=1000, output='sos') # Creates the filter with type 'band'
-databpf = signal.sosfilt(sos,contractData) # Applies the filter
+sos_bandpass = signal.butter(order, frequencies_bandpass, btype='pass', fs=fs, output='sos')
+sos_stop = signal.butter(order, frequencies_stop, btype='stop', fs=fs, output='sos')
 
-sos = signal.butter(order,[f3,f4], btype='stop', fs=1000, output='sos') # Creates the filter with type 'band'
-databpfOne = signal.sosfilt(sos,databpf) # Applies the filter
+datasets = [contractData, relaxedData]
+filtered_data = []
 
-sos = signal.butter(order,[f1,f2], btype='bandpass', fs=1000, output='sos') # Creates the filter with type 'band'
-databpfTwo = signal.sosfilt(sos, relaxedData) # Applies the filter
+for data in datasets:
+    databpf = signal.sosfilt(sos_bandpass, data)
+    databpf_filtered = signal.sosfilt(sos_stop, databpf)
+    filtered_data.append(databpf_filtered)
 
-sos = signal.butter(order,[f3,f4], btype='stop', fs=1000, output='sos') # Creates the filter with type 'band'
-databpfThree = signal.sosfilt(sos,databpfTwo) # Applies the filter
+# Separate the filtered datasets for further processing
+databpfOne, databpfThree = filtered_data
 
 # Get the fft fo both unfiltered and filtered
 N=len(contractData)
@@ -73,20 +74,20 @@ print(len(yf))
 print(len(databpf_f))
 print(len(databpf_fOne))
 
-plt.figure(figsize=(14, 6))
+plt.figure(figsize=(13, 6))
 
 plt.subplot(1,3,1)
-plt.plot(xf,yf,'--',label='signal')
+plt.plot(xf,yf,label='signal')
 plt.xlim([98,102])
 plt.legend()
 
 plt.subplot(1,3,2)
-plt.plot(xf,databpf_f,'k',label='filtered contracted signal')
+plt.plot(xf,databpf_f,label='filtered contracted signal', color = 'orange')
 plt.xlim([98,102])
 plt.legend()
 
 plt.subplot(1,3,3)
-plt.plot(xf,databpf_fOne,'k',label='filtered relaxed signal')
+plt.plot(xf,databpf_fOne,label='filtered relaxed signal', color = 'green')
 plt.xlim([98,102])
 plt.legend()
 
