@@ -38,14 +38,14 @@ for _, row in dataset.iterrows():
     yRelaxed.append(relaxedRMS)
 
 # CHECK AND UPDATE THISSSSSS 
-for _, row in filteredContractedDataSet.iterrows():
-    timeT = (row['Time (s)'])
-    first_half_time = timeT[:len(timeT)//2]
-    contractFilterEMG = row['Filtered EMG Contracted']
-    contractFilterRMS = RMS(contractFilterEMG)
+# for _, row in filteredContractedDataSet.iterrows():
+#     timeT = (row['Time (s)'])
+#     first_half_time = timeT[:len(timeT)//2]
+#     contractFilterEMG = row['Filtered EMG Contracted']
+#     contractFilterRMS = RMS(contractFilterEMG)
 
-    xFilter.append(first_half_time)
-    yFilterContract.append(contractFilterRMS)
+#     xFilter.append(first_half_time)
+#     yFilterContract.append(contractFilterRMS)
 
 with open(contractFilePath, "w") as file:
     file.write("Time (s),RMS EMG Contracted\n")
@@ -72,6 +72,8 @@ plt.figure(figsize=(18, 6))  # Adjust the figure size as per your requirement
 
 
 # plotting the relaxed EMG
+
+
 plt.subplot(1,3,1)
 plt.plot(x, yRelaxed, label='Relaxed EMG RMS')
 plt.xlabel('Time (s)')
@@ -85,11 +87,24 @@ plt.xlabel('Time (s)')
 plt.ylabel('Contracted EMG')
 plt.title('Contracted EMG RMS Processed')
 
+first_column = dataset.iloc[:, 0]
+third_column = dataset.iloc[:, 2]
+
+# Plot the data
 plt.subplot(1,3,3)
-plt.plot(xFilter, yFilterContract, label = 'Contracted Filtered EMG RMS', color = 'orange')
-plt.xlabel('Time (s)')
-plt.ylabel('Contracted Filtered EMG')
-plt.title('Contracted Filtered EMG RMS Processed')
+plt.plot(first_column, label='First Column')
+plt.plot(third_column, label='Third Column')
+plt.xlabel('Time')
+plt.ylabel('Value')
+plt.legend()
+plt.title('Plot of First and Third Columns from CSV')
+plt.grid(True)
+
+# plt.subplot(1,3,3)
+# plt.plot(xFilter, yFilterContract, label = 'Contracted Filtered EMG RMS', color = 'orange')
+# plt.xlabel('Time (s)')
+# plt.ylabel('Contracted Filtered EMG')
+# plt.title('Contracted Filtered EMG RMS Processed')
 
 plt.tight_layout()  # To prevent overlapping of subplots
 plt.pause(0.1)

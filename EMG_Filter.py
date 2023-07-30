@@ -13,11 +13,12 @@ relaxedFilterOutput = 'EMG-Filter/Output_Files/relaxedFilterOut.csv'
 # y = np.sin(2*np.pi*100*x) # frequency is 100 Hz
 relaxedData= dataset['EMG_Relaxed (mV)'].to_numpy()
 contractData = dataset['EMG_Contracted (mV)'].to_numpy()
+time = dataset['Time (s)'].to_numpy()
 x = np.linspace(0,10,len(contractData)) # fs is 10000/10 = 1000
 
 order = 8
 fs = 1000
-frequencies_bandpass = [40, 100]
+frequencies_bandpass = [0.1, 450]
 frequencies_stop = [57, 63]
 
 sos_bandpass = signal.butter(order, frequencies_bandpass, btype='pass', fs=fs, output='sos')
@@ -31,22 +32,21 @@ for data in datasets:
     databpf_filtered = signal.sosfilt(sos_stop, databpf)
     filtered_data.append(databpf_filtered)
 
-# Separate the filtered datasets for further processing
 databpfOne, databpfThree = filtered_data
 
 # Get the fft fo both unfiltered and filtered
-N=len(contractData)
-yf=(2/N) * np.abs(fft(contractData)) 
+N = len(contractData)
+yf = (2/N) * np.abs(fft(contractData)) 
 databpf_f = (2/N) * np.abs(fft(databpfOne))
 
 # Truncate fft to RHS only
-xf=fftfreq(N,1/1000) # ts=1/fs is the 0.1
-yf=yf[0:N//2]
+xf = fftfreq(N,1/1000) # ts=1/fs is the 0.1
+yf = yf[0:N//2]
 databpf_f = databpf_f[0:N//2]
 
-yfr=(2/N) * np.abs(fft(relaxedData)) 
+yfr = (2/N) * np.abs(fft(relaxedData)) 
 databpf_fOne = (2/N) * np.abs(fft(databpfThree))
-yfr=yfr[0:N//2]
+yfr = yfr[0:N//2]
 databpf_fOne = databpf_fOne[0:N//2]
 
 xf = xf[0:N//2]
@@ -76,19 +76,21 @@ print(len(databpf_fOne))
 
 plt.figure(figsize=(13, 6))
 
-plt.subplot(1,3,1)
-plt.plot(xf,yf,label='signal')
-plt.xlim([98,102])
+plt.subplot(1,4,1)
+plt.plot(time,contractData,label='contracted signal')
 plt.legend()
 
-plt.subplot(1,3,2)
+plt.subplot(1,4,2)
+plt.plot(time, relaxedData,label='relaxed signal')
+plt.legend()
+
+plt.subplot(1,4,3)
 plt.plot(xf,databpf_f,label='filtered contracted signal', color = 'orange')
-plt.xlim([98,102])
+# plt.xlim([0,450])
 plt.legend()
 
-plt.subplot(1,3,3)
+plt.subplot(1,4,4)
 plt.plot(xf,databpf_fOne,label='filtered relaxed signal', color = 'green')
-plt.xlim([98,102])
 plt.legend()
 
 plt.tight_layout()  # prevent overlapping of subplots
