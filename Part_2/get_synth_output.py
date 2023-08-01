@@ -149,7 +149,7 @@ def main():
     plt.savefig(OUTPUT_SIN_VALS)
     plt.clf()
     
-    df = pd.DataFrame({"audio_data": audio_data})
+    df = pd.DataFrame({"synthesized_audio_data": concatenated_chunks})
     df.to_csv(f"{TITLE}_audio_data.csv")
     
     print("Finished")
