@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
@@ -147,6 +148,9 @@ def main():
     plt.plot(sin_values)
     plt.savefig(OUTPUT_SIN_VALS)
     plt.clf()
+    
+    df = pd.DataFrame({"audio_data": audio_data})
+    df.to_csv(f"{TITLE}_audio_data.csv")
     
     print("Finished")
             
