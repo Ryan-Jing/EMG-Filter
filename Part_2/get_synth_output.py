@@ -5,7 +5,10 @@ from scipy import signal
 from scipy.io import wavfile
 import wave
 
-# BASE PARAMETERS
+"""
+BASE PARAMETERS
+Change these to change variables of filters, number of filters, and other hyperparameters for synthesizing audio
+"""
 CHUNK_LENGTH = 160*4 # 160 is 10ms because sample rate is 16kHz
 OVERLAP = 0
 CENTRE_FREQUENCY = 100
@@ -22,10 +25,13 @@ OUTPUT_RMS_VALS = f"{TITLE}_rms_vals.png"
 OUTPUT_SIN_VALS = f"{TITLE}_sin_vals.png"
 
 
-rms_values = []
-sin_values = []
+rms_values = [] # helpful for analyzing issues with magnitude of output
+sin_values = [] # helpful for anlayzing issues with magnitidue and frequencies of output
 
 def create_bandpass_filters(centre_frequency, band_width, filter_type, number_of_filters, order, interval, sample_rate=SAMPLING_RATE):
+    """
+    Creates list of filters with centre frequencies evenly spaced between centre_frequency and centre_frequency + interval*number_of_filters
+    """
     filters = [create_bandpass_filter(
             filter_type=filter_type, 
             order=order, 
@@ -37,6 +43,9 @@ def create_bandpass_filters(centre_frequency, band_width, filter_type, number_of
     return filters
 
 def create_bandpass_filter(filter_type: str, order: int, centre_freq: int, band_width: int, sample_rate: int):
+    """
+    Creates single bandpass filter of butterworth or chebyshev type with scipy
+    """
     lower_freq = centre_freq - band_width / 2
     upper_freq = centre_freq + band_width / 2
     
@@ -61,15 +70,23 @@ def create_bandpass_filter(filter_type: str, order: int, centre_freq: int, band_
         raise ValueError("Filter type must be either 'butterworth' or 'chebyshev'")
 
 def filter_chunk(filter, chunk):
+    """
+    Filters chunk with given scipy filter of "sos" type
+    """
     return signal.sosfilt(filter, chunk)
 
 def get_rms(filtered_chunk):
+    """
+    Returns RMS of list or array of numbers
+    """
     rms = np.sqrt(np.mean(filtered_chunk**2))
     rms_values.append(rms)
     return rms
 
 def synthesize(rms, chunk_length, centre_freq_band, start_time, sampling_rate=SAMPLING_RATE):
-    # time = np.arange(start_time, start_time+chunk_length, chunk_length/SAMPLING_RATE)
+    """
+    Generates synthesized audio given an RMS and centre frequency
+    """
     time = np.arange(start_time, start_time+chunk_length)
     time_seconds = time / sampling_rate
     sin_wave = np.sin(2 * np.pi * centre_freq_band * time_seconds)
@@ -78,9 +95,6 @@ def synthesize(rms, chunk_length, centre_freq_band, start_time, sampling_rate=SA
     for val in sin_wave.tolist():
         sin_values.append(val)
     return varying_amplitude
-
-def concat_chunks(chunks):
-    return np.concatenate(chunks)
 
 def split_audio(audio_data, chunk_length, overlap):
     assert overlap < chunk_length, "Overlap must be less than chunk length"
